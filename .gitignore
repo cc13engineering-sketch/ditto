@@ -3,6 +3,10 @@
 /cache/
 /state.json
 
-# keep the variants dir but not generated contents (smart.json is seeded on first run)
-/variants/*.json
-!/variants/.gitkeep
+node_modules/
+
+# bun project — no npm lockfile
+package-lock.json
+
+# lol
+bun.lock
