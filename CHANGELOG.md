@@ -2,6 +2,16 @@
 
 ## 2026-04-13
 
+- **Add `INSTALL.md` + `install.sh` for one-liner curl install** (session —
+  per user plan). `curl -fsSL .../install.sh | bash` now clones (or
+  `git pull --ff-only`s) `~/.ditto`, rsyncs `skill/` to
+  `~/.claude/skills/ditto/`, and idempotently appends `~/.ditto/bin` to
+  `PATH` via the user's shell rc (zsh / bash / fish / profile detected
+  from `$SHELL`). Prereq-aborts (no auto-install) on missing `git`,
+  `bun`, or `rsync` — per user decision. Honors `DITTO_HOME`. Re-running
+  the same command is the update path. `README.md` gets a one-line
+  pointer to `INSTALL.md` near the top so the README doesn't go stale
+  about setup. No changes under `src/`.
 - **Skill redesign: batched lazy walkthrough** (session — per user plan;
   skill-only, no CLI changes). `skill/SKILL.md` now drives a 3-phase flow
   (Intake / Batched Walkthrough / Finalize) with 10-suggestion batches, a

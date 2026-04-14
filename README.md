@@ -13,6 +13,14 @@ ditto restore                # back to pristine
 ditto ships with a `smart` variant already committed in `variants/` —
 `ditto apply smart` to try it without authoring anything.
 
+## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/cc13engineering-sketch/ditto/main/install.sh | bash
+```
+
+See [INSTALL.md](INSTALL.md) for prerequisites, manual install, updating, and uninstall.
+
 ## How it works
 
 1. `ditto check` — confirms your installed Claude Code matches a published
