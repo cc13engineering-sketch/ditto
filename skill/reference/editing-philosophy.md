@@ -1,6 +1,6 @@
-# Patcher philosophy — worked examples of directive → edit
+# Editing philosophy — worked examples of directive → edit
 
-The original `~/DIY/AI/patcher/patch-claude-code.sh` encodes 13 edits under one
+The shipped `smart` variant (`variants/smart.json`) encodes 13 edits under one
 coherent directive: **quality > speed, judgment > rules, pragmatic adjacent
 fixes > narrow scope**. Read this file when you need a mental model for
 "what a high-impact, directive-aligned edit looks like."

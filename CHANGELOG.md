@@ -2,6 +2,17 @@
 
 ## 2026-04-13
 
+- **Skill redesign: batched lazy walkthrough** (session — per user plan;
+  skill-only, no CLI changes). `skill/SKILL.md` now drives a 3-phase flow
+  (Intake / Batched Walkthrough / Finalize) with 10-suggestion batches, a
+  4-way Accept/Skip/Tweak/Submit-all-and-finish choice on every prompt, a
+  tweak-refinement inner loop, and cross-batch `tweakSignals` that shape
+  ranking and rewrite style. Also renamed
+  `skill/reference/patcher-philosophy.md` → `editing-philosophy.md` and
+  scrubbed its pointer at the author's laptop, so the reference ships
+  cleanly with the repo. Existing CLI subcommands (`save --stdin`, `diff`,
+  `apply`, `prompts --json`, `show`, `check`, `reinstall`) already covered
+  everything; nothing under `src/` changed.
 - **Remove `bootstrap-smart`** (session — per user's implementation plan).
   Removed the `bootstrap-smart` subcommand and the first-run auto-seed in
   `ditto check`. The patcher shell script at

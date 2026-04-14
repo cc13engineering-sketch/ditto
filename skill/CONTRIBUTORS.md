@@ -25,7 +25,7 @@ result as a reusable named variant, and apply.
   edits surgical and makes them likely to survive minor Claude Code updates
   that re-word surrounding pieces.
 - **Reference doc is a philosophy primer, not a templater.** The 13 worked
-  examples in `reference/patcher-philosophy.md` teach Claude what a high-
+  examples in `reference/editing-philosophy.md` teach Claude what a high-
   impact directive-aligned edit *feels* like (replace hard rules with
   judgment; tone down rigid negatives). They're not meant to be copy-pasted.
 - **Strict-fail on version mismatch.** If tweakcc has no matching prompts
