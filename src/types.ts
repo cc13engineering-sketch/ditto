@@ -44,3 +44,10 @@ export interface State {
   appliedAt: string | null;
   claudeCodeVersion: string | null;
 }
+
+export interface StagedPromptSet {
+  claudeCodeVersion: string;
+  tweakccVersion: string;
+  stagedAt: string;
+  kept: { id: string; reason: string }[];
+}

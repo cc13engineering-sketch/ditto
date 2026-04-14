@@ -7,9 +7,10 @@ export const STATE_FILE = path.join(DITTO_HOME, "state.json");
 export const CACHE_DIR = path.join(DITTO_HOME, "cache");
 export const PROMPT_CACHE_DIR = path.join(CACHE_DIR, "prompts");
 export const VARIANTS_DIR = path.join(DITTO_HOME, "variants");
+export const STAGED_DIR = path.join(DITTO_HOME, "staged");
 
 export function ensureDirs(): void {
-  for (const d of [DITTO_HOME, CACHE_DIR, PROMPT_CACHE_DIR, VARIANTS_DIR]) {
+  for (const d of [DITTO_HOME, CACHE_DIR, PROMPT_CACHE_DIR, VARIANTS_DIR, STAGED_DIR]) {
     mkdirSync(d, { recursive: true });
   }
 }

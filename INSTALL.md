@@ -12,6 +12,7 @@ Re-run the same command to update.
 - Mirrors `~/.ditto/skill/` to `~/.claude/skills/ditto/` so Claude Code auto-loads the skill.
 - Appends `~/.ditto/bin` to your `PATH` via your shell rc (`~/.zshrc`, `~/.bashrc`/`~/.bash_profile`, `~/.config/fish/config.fish`, or `~/.profile`). Idempotent — re-running won't duplicate the line.
 - Respects `DITTO_HOME` if you set it; otherwise installs to `~/.ditto`.
+- Ships a pre-built `staged/prompts-2.1.104.json` so fresh installs can `ditto apply smart` without running the skill first.
 
 ## Prerequisites
 

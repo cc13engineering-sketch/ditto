@@ -2,6 +2,16 @@
 
 ## 2026-04-14
 
+- **Add Phase-0 stage-mode detector + staging-workflow reference** (session —
+  per user plan). The skill now branches at Phase 0: invocations matching
+  stage intent (`"stage ditto"`, `"stage prompts"`, `"re-stage"`, etc.)
+  load `reference/staging-workflow.md` and run the classification flow
+  (keep/prune/grey with AskUserQuestion walkthrough for grey prompts)
+  against the tweakcc catalog, then write a `StagedPromptSet` to
+  `staged/prompts-{cc-version}.json`. Non-stage invocations proceed to
+  the existing Phase 1 intake. Phase 1 also updated to surface
+  "run `ditto stage` first" guidance when the CLI's precheck/catalog
+  commands error on a missing staged file.
 - **Rename `reference/patcher-philosophy.md` → `reference/editing-philosophy.md`**
   (session — per user). The skill ships as part of the repo and shouldn't
   reference files on the author's laptop. Renamed the file, scrubbed the

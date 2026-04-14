@@ -2,6 +2,22 @@
 
 ## 2026-04-14
 
+- **Add `ditto stage` to pre-filter harness-critical prompts per CC version**
+  (session — per user plan). The tweakcc catalog ships ~280 prompts per
+  Claude Code version, but variant authoring should only touch the minority
+  that shape tone/style/philosophy. `ditto stage [version]` now prepares a
+  per-version whitelist at `staged/prompts-{version}.json`; the ditto skill
+  runs the classification (keep/prune/grey, with walkthrough for grey) and
+  writes the file. New files: `src/stage.ts` (I/O helpers), `src/types.ts`
+  `StagedPromptSet`, `STAGED_DIR` in `src/paths.ts`, and `cmdStage` in
+  `src/cli.ts`. Enforcement: `ditto apply <variant>` and `ditto prompts`
+  hard-error when the staged file is missing for the current CC version;
+  `ditto check` reports `staged: yes (N kept)` or `no (run: ditto stage)`.
+  Pre-committed `staged/prompts-2.1.104.json` (73 kept of 280) so fresh
+  installs can `ditto apply smart` without staging first. `patch.ts` is
+  untouched — existing variants keep applying regardless of the staged
+  set, enforcement is authoring-time only. Help text and README Commands
+  table updated.
 - **Remove laptop-path references** (session — per user). The repo ships to
   other machines; it shouldn't reference the original author's filesystem.
   Dropped the `PATCHER_LOCAL_PROMPTS_DIR` constant from `src/paths.ts` and the

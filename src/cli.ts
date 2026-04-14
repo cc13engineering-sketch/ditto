@@ -1,11 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { detectClaudeCode } from "./detect";
 import { renderPerModDiff } from "./diff";
-import { cachedPromptSetPath, getPromptSet, TweakccNotFoundError } from "./fetch";
+import { cachedPromptSetPath, getLatestTweakccVersion, getPromptSet, TweakccNotFoundError } from "./fetch";
 import { ensureDirs, DITTO_HOME } from "./paths";
 import { applyVariantToFile } from "./patch";
 import { findPromptById, renderPromptAnnotated, summarize } from "./prompts";
 import { reinstallClaudeCode } from "./reinstall";
+import { hasStaged, readStaged, stagedPath } from "./stage";
 import { readState, writeState } from "./state";
 import { listVariants, loadVariant, saveVariant, validateVariantName, validateVariantShape } from "./variants";
 import { verifyCliJs } from "./verify";
@@ -27,6 +28,8 @@ async function main(): Promise<void> {
         return await cmdDiff(rest);
       case "apply":
         return await cmdApply(rest);
+      case "stage":
+        return await cmdStage(rest);
       case "reinstall":
         return await cmdReinstall();
       case "list":
@@ -64,6 +67,7 @@ function cmdHelp(): void {
     "                               Save a variant JSON",
     "  diff <name>                  Show per-modification diff of a variant",
     "  apply <name>                 Apply variant → verify → update state (reinstalls on switch/failure)",
+    "  stage [version]              Prepare per-version staged prompt whitelist (skill writes it)",
     "  reinstall                    npm reinstall the current Claude Code version to return to pristine",
     "  list                         List saved variants; mark which is applied",
     "  status                       Summarize Claude Code / tweakcc / applied variant",
@@ -88,13 +92,30 @@ async function cmdCheck(): Promise<void> {
     }
     throw err;
   }
+
+  if (hasStaged(det.version)) {
+    const staged = readStaged(det.version);
+    process.stdout.write(`staged: yes (${staged.kept.length} kept)\n`);
+  } else {
+    process.stdout.write(`staged: no  (run: ditto stage)\n`);
+  }
 }
 
 async function cmdPrompts(rest: string[]): Promise<void> {
   const json = rest.includes("--json");
   const det = detectClaudeCode();
+
+  if (!hasStaged(det.version)) {
+    throw new Error(
+      `No staged prompt set for Claude Code ${det.version}. Run: ditto stage`,
+    );
+  }
+
   const set = await getPromptSet(det.version);
-  const rows = summarize(set.prompts);
+  const staged = readStaged(det.version);
+  const keptIds = new Set(staged.kept.map((k) => k.id));
+  const kept = set.prompts.filter((p) => keptIds.has(p.id));
+  const rows = summarize(kept);
   if (json) {
     process.stdout.write(JSON.stringify({ version: set.version, prompts: rows }, null, 2) + "\n");
     return;
@@ -103,7 +124,9 @@ async function cmdPrompts(rest: string[]): Promise<void> {
   for (const r of rows) {
     process.stdout.write(`${r.id.padEnd(idWidth)}  ${r.name}  — ${r.description}\n`);
   }
-  process.stdout.write(`\n${rows.length} prompts  (claude-code ${det.version}, tweakcc ${set.version})\n`);
+  process.stdout.write(
+    `\n${rows.length} prompts kept (of ${set.prompts.length})  (claude-code ${det.version}, tweakcc ${set.version})\n`,
+  );
 }
 
 async function cmdShow(rest: string[]): Promise<void> {
@@ -170,6 +193,12 @@ async function cmdApply(rest: string[]): Promise<void> {
   const variant = loadVariant(name);
   const det = detectClaudeCode();
 
+  if (!hasStaged(det.version)) {
+    throw new Error(
+      `No staged prompt set for Claude Code ${det.version}. Run: ditto stage`,
+    );
+  }
+
   if (variant.claudeCodeVersion !== det.version) {
     process.stderr.write(
       `warning: variant was authored for ${variant.claudeCodeVersion}, current is ${det.version}\n`,
@@ -229,6 +258,44 @@ async function cmdApply(rest: string[]): Promise<void> {
       }
     }
   }
+}
+
+async function cmdStage(rest: string[]): Promise<void> {
+  let version = rest[0];
+  if (!version) {
+    const latest = await getLatestTweakccVersion().catch(() => null);
+    if (latest) {
+      version = latest;
+    } else {
+      const det = detectClaudeCode();
+      version = det.version;
+      process.stderr.write(
+        `warning: could not reach tweakcc; falling back to installed Claude Code version ${version}\n`,
+      );
+    }
+  }
+
+  try {
+    await getPromptSet(version);
+  } catch (err) {
+    if (err instanceof TweakccNotFoundError) {
+      process.stderr.write(err.message + "\n");
+      process.exit(1);
+    }
+    throw err;
+  }
+
+  const catalogPath = cachedPromptSetPath(version);
+  const path = stagedPath(version);
+  const alreadyStaged = hasStaged(version);
+
+  process.stdout.write(
+    JSON.stringify(
+      { version, catalogPath, stagedPath: path, alreadyStaged },
+      null,
+      2,
+    ) + "\n",
+  );
 }
 
 async function cmdReinstall(): Promise<void> {

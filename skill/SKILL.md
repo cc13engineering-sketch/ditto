@@ -19,14 +19,37 @@ Code by surgically rewriting system prompts to match a natural-language
 Never edit `cli.js` yourself — build the variant JSON and pipe it through
 `ditto save` + `ditto apply`.
 
+## Phase 0 — Mode detection
+
+Before anything else, check whether the invocation is a **stage** request
+(classify prompts for a Claude Code version) rather than a variant-authoring
+request. Stage-mode triggers on phrases like:
+
+- `"stage ditto"`, `"ditto stage"`, `"stage prompts"`, `"re-stage"`
+- `"stage ditto for 2.1.107"`, `"stage ditto for the current version"`
+- `"classify prompts"`, `"refresh the staged whitelist"`
+
+If the invocation matches, read `~/.claude/skills/ditto/reference/staging-workflow.md`
+and follow the stage-mode flow there. Do NOT continue into Phase 1.
+
+Otherwise (the invocation is a directive like "make claude X" / "customize
+claude to Y"), proceed to Phase 1 — Intake.
+
 ## Phase 1 — Intake
 
 ```
 1. Precheck:   ~/.ditto/bin/ditto check   (non-zero → print stdout+stderr, stop)
+                 If the output ends with "staged: no  (run: ditto stage)", tell
+                 the user the staged whitelist is missing and suggest they run
+                 the skill with "stage ditto" first. Stop — do not author.
 2. Directive:  extract from the invocation. If ambiguous, ONE AskUserQuestion:
                  "What should this variant emphasize?"  (single "Other" free-text)
 3. Catalog:    ~/.ditto/bin/ditto prompts --json
                  → catalog = {version, prompts: [{id,name,description,pieceCount}]}
+                 This feed is already filtered to the staged whitelist — treat
+                 it as the full universe for ranking. If the command errors
+                 with "No staged prompt set", surface the error and suggest
+                 staging first.
 4. Philosophy: read ~/.claude/skills/ditto/reference/editing-philosophy.md once.
 ```
 

@@ -89,9 +89,31 @@ Use the skill when you're authoring; use the CLI when you're operating.
 | `ditto save <name>`      | save a variant (from `--stdin` or `--file`) |
 | `ditto diff <name>`      | preview what a variant would change |
 | `ditto apply <name>`     | apply it (with verify + auto-recover) |
+| `ditto stage [version]`  | prepare the per-version safe-to-modify prompt whitelist |
 | `ditto reinstall`        | npm reinstall current version to return to pristine |
 | `ditto list`             | see your variants |
 | `ditto status`           | what's installed, what's applied |
+
+## Staging
+
+The tweakcc catalog ships ~280 prompts per Claude Code version, but most of
+them are load-bearing for the harness — tool schemas, security rails,
+plan-mode machinery, git safety. Variant authoring should only touch the
+minority that shape tone, style, and coding philosophy.
+
+`ditto stage [version]` prepares a per-version whitelist at
+`staged/prompts-{version}.json`. The ditto skill runs the classification
+(keep / prune / grey, with a walkthrough for grey cases) and writes the
+file; `ditto apply` and the skill's prompts feed hard-error if the staged
+file is missing for the current Claude Code version.
+
+ditto ships `staged/prompts-2.1.104.json` pre-committed, so fresh installs
+can `ditto apply smart` without running the skill first. When you upgrade
+Claude Code to a version with no pre-shipped staged set, invoke the skill
+with `"stage ditto for the current version"` to build one.
+
+Existing variants keep applying regardless of the staged set —
+enforcement is authoring-time only.
 
 ## Variant shape
 
@@ -115,6 +137,7 @@ Use the skill when you're authoring; use the CLI when you're operating.
 ├── bin/ditto          # bun shim
 ├── src/               # TypeScript source (no build step)
 ├── variants/          # your library
+├── staged/            # per-version safe-to-modify whitelists
 ├── cache/prompts/     # tweakcc prompts-{version}.json
 └── state.json         # which variant is applied
 
