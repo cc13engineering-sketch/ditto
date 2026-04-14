@@ -2,6 +2,14 @@
 
 ## 2026-04-13
 
+- **Remove `bootstrap-smart`** (session — per user's implementation plan).
+  Removed the `bootstrap-smart` subcommand and the first-run auto-seed in
+  `ditto check`. The patcher shell script at
+  `~/DIY/AI/patcher/patch-claude-code.sh` is no longer the source of truth
+  for the `smart` variant — `variants/smart.json` ships as a committed
+  default. Deleted `src/bootstrap.ts` and the `PATCHER_SCRIPT` path
+  constant; `PATCHER_LOCAL_PROMPTS_DIR` stays (used independently by
+  `fetch.ts` as the offline prompt-cache fallback).
 - **Fix TS types** (session — user-reported error).
   - Replaced deprecated `bun-types` with `@types/bun@^1.3.12` in
     devDependencies; updated `tsconfig.json` `types` array from

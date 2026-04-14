@@ -1,13 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
-import { bootstrapSmart } from "./bootstrap";
 import { detectClaudeCode } from "./detect";
-import { renderPerModDiff, simulateApply } from "./diff";
-import { cachedPromptSetPath, getLatestTweakccVersion, getPromptSet, TweakccNotFoundError } from "./fetch";
+import { renderPerModDiff } from "./diff";
+import { cachedPromptSetPath, getPromptSet, TweakccNotFoundError } from "./fetch";
 import { ensureDirs, DITTO_HOME } from "./paths";
 import { applyVariantToFile, restoreFromBackup } from "./patch";
 import { findPromptById, renderPromptAnnotated, summarize } from "./prompts";
 import { readState, writeState } from "./state";
-import { hasVariant, listVariants, loadVariant, saveVariant, validateVariantName, validateVariantShape } from "./variants";
+import { listVariants, loadVariant, saveVariant, validateVariantName, validateVariantShape } from "./variants";
 import { verifyCliJs } from "./verify";
 
 async function main(): Promise<void> {
@@ -33,8 +32,6 @@ async function main(): Promise<void> {
         return cmdList();
       case "status":
         return cmdStatus();
-      case "bootstrap-smart":
-        return await cmdBootstrapSmart();
       case undefined:
       case "help":
       case "--help":
@@ -69,7 +66,6 @@ function cmdHelp(): void {
     "  restore                      Restore cli.js from the most recent backup",
     "  list                         List saved variants; mark which is applied",
     "  status                       Summarize Claude Code / tweakcc / applied variant",
-    "  bootstrap-smart              Seed variants/smart.json from ~/DIY/AI/patcher/patch-claude-code.sh",
     "  help                         This help",
     "",
     `home: ${DITTO_HOME}`,
@@ -90,19 +86,6 @@ async function cmdCheck(): Promise<void> {
       process.exit(1);
     }
     throw err;
-  }
-
-  // First-run: auto-seed smart variant (plan section "Seed variant smart")
-  if (!hasVariant("smart")) {
-    const r = await bootstrapSmart();
-    if (r.created) {
-      process.stdout.write(
-        `seeded variants/smart.json  (${r.modifications} mods, ${r.skipped} skipped)\n` +
-          `apply it:  ditto apply smart\n`,
-      );
-    } else {
-      process.stdout.write(`smart seed: ${r.reason}\n`);
-    }
   }
 }
 
@@ -263,7 +246,7 @@ function cmdList(): void {
   const state = readState();
   const variants = listVariants();
   if (variants.length === 0) {
-    process.stdout.write("(no variants yet — use the ditto skill or `ditto bootstrap-smart`)\n");
+    process.stdout.write("(no variants yet — use the ditto skill)\n");
     return;
   }
   const nameWidth = Math.max(...variants.map((v) => v.name.length), 4);
@@ -294,20 +277,6 @@ function cmdStatus(): void {
   if (state.appliedAt) process.stdout.write(`applied at: ${state.appliedAt}\n`);
   if (state.lastBackupPath) process.stdout.write(`last backup: ${state.lastBackupPath}\n`);
   process.stdout.write(`ditto home: ${DITTO_HOME}\n`);
-}
-
-async function cmdBootstrapSmart(): Promise<void> {
-  const r = await bootstrapSmart();
-  if (r.created) {
-    process.stdout.write(`${r.reason}\n`);
-    process.stdout.write(`  ${r.modifications} modifications, ${r.skipped} skipped\n`);
-    process.stdout.write(`  → ${r.path}\n`);
-    if (r.skipped) {
-      process.stdout.write(`  (skipped entries likely drifted out of this Claude Code version)\n`);
-    }
-  } else {
-    process.stdout.write(`no-op: ${r.reason}\n`);
-  }
 }
 
 async function readStdinAll(): Promise<string> {

@@ -32,17 +32,20 @@ catalog, parse variant JSONs, diff / apply / verify / restore against
   `prompts-{version}.json`, `ditto check` exits non-zero with an actionable
   message (latest tweakcc version + downgrade command). The skill relays this
   and stops.
-- **Auto-seed the `smart` variant.** First successful `ditto check` parses the
-  13 `patch(...)` calls from the patcher bash script and maps each to a
-  `{promptId, pieceIndex}`. Unmatched entries go into `skipped[]` — still
-  useful signal.
+- **`smart` ships as a committed default.** `variants/smart.json` is checked
+  in as a shipped artifact — the patcher's original opinions (quality > speed,
+  judgment > rules) mapped to `{promptId, pieceIndex}` edits for the pinned
+  tweakcc version. Users get it for free via `ditto apply smart`; it evolves
+  through the ditto skill or hand edits to the JSON, not by re-running a
+  shell-script reverse-engineer step.
 
 ## Layout
 
 - `bin/ditto` — `#!/usr/bin/env bun` shim to `src/cli.ts`.
 - `src/` — one module per concern (detect, fetch, prompts, patch, variants,
-  diff, verify, bootstrap, state, paths, types, cli).
-- `variants/` — user's named variant JSONs (incl. seeded `smart.json`).
+  diff, verify, state, paths, types, cli).
+- `variants/` — user's named variant JSONs (ships with `smart.json` as a
+  committed default).
 - `cache/prompts/` — cached `prompts-{version}.json` files.
 - `backups/` — timestamped cli.js backups.
 - `state.json` — tracks currently-applied variant + last backup path.

@@ -9,7 +9,6 @@ export const PROMPT_CACHE_DIR = path.join(CACHE_DIR, "prompts");
 export const BACKUPS_DIR = path.join(DITTO_HOME, "backups");
 export const VARIANTS_DIR = path.join(DITTO_HOME, "variants");
 
-export const PATCHER_SCRIPT = path.join(os.homedir(), "DIY", "AI", "patcher", "patch-claude-code.sh");
 export const PATCHER_LOCAL_PROMPTS_DIR = path.join(os.homedir(), "DIY", "AI", "patcher");
 
 export function ensureDirs(): void {

@@ -5,10 +5,13 @@ A library of Claude Code personalities.
 Give it a directive. Get a named variant you can apply, restore, and swap.
 
 ```
-ditto apply smart            # the patcher's 13 original opinions
+ditto apply smart            # shipped default: quality > speed, judgment > rules
 ditto apply trust-me-more    # one you authored via the skill
 ditto restore                # back to pristine
 ```
+
+ditto ships with a `smart` variant already committed in `variants/` —
+`ditto apply smart` to try it without authoring anything.
 
 ## How it works
 
@@ -33,7 +36,6 @@ ditto restore                # back to pristine
 | `ditto restore`          | roll back to the last backup |
 | `ditto list`             | see your variants |
 | `ditto status`           | what's installed, what's applied |
-| `ditto bootstrap-smart`  | seed `smart` from the patcher script |
 
 ## Variant shape
 
