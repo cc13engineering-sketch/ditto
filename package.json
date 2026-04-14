@@ -1,0 +1,13 @@
+{
+  "name": "ditto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Directive-driven Claude Code prompt modification, with named variants",
+  "bin": {
+    "ditto": "bin/ditto"
+  },
+  "engines": {
+    "bun": ">=1.1"
+  }
+}
