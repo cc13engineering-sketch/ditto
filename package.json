@@ -10,6 +10,9 @@
   "engines": {
     "bun": ">=1.1"
   },
+  "scripts": {
+    "update-skill": "mkdir -p ~/.claude/skills && rsync -a --delete skill/ ~/.claude/skills/ditto/"
+  },
   "devDependencies": {
     "@types/bun": "^1.3.12",
     "@types/node": "^25.6.0"
